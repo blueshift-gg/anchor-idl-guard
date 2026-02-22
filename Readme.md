@@ -32,7 +32,13 @@ Anchor's `IdlCreateAccount` instruction creates the canonical IDL account (deriv
 
 ## How It Works
 
-`anchor_idl_guard` exports a single `entrypoint!` macro that replaces Anchor's default program entrypoint with a gated version. Before forwarding any instruction to Anchor's `entry()` function, it inspects the instruction data for the IDL discriminator (`0x40f4bc78a7e9690a`). If it detects an IDL instruction, it checks the signer against a whitelist of authorized public keys and rejects the transaction with `MissingRequiredSignature` if a match is not found.
+1. `anchor_idl_guard` exports a single `entrypoint!` macro that replaces Anchor's default program entrypoint with a gated version. 
+2. Before forwarding any instruction to Anchor's `entry()` function, it inspects the instruction data for the IDL discriminator (`0x40f4bc78a7e9690a`). 
+3. If an IDL instruction is detected, it checks the secondary discriminator for the two offeding instructions:
+   1.  `0x00` (`IdlCreateAccount`), and 
+   2.  `0x01` (`IdlCreateBuffer`)
+4. The signer of the instruction is matched against the whitelist of authorized public keys.
+5. If a match is not found, the instruction will error out with `MissingRequiredSignature`.
 
 ## Usage
 
@@ -88,4 +94,4 @@ entrypoint!(["Authority1111111111111111111111111111111111", "Authority2222222222
 
 ## Alternatives
 
-It is also possible to mitigate IDL-based attacks by simple enabling the `no-idl` feature in your Cargo.toml, however doing so will also prevent you from being able to publish your IDL which may not be your intended outcome.
+It is also possible to mitigate IDL-based attacks by simply enabling the `no-idl` feature in your Cargo.toml, however doing so will also prevent you from being able to publish your IDL which may not be your intended outcome.
