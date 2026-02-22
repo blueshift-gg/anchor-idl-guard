@@ -10,3 +10,4 @@ name = "anchor_idl_guard"
 
 [dependencies]
 anchor-lang = "<1.0.0"
+five8_const = "1.0.0"

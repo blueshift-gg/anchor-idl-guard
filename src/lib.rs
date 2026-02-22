@@ -1,3 +1,5 @@
+pub use five8_const::decode_32_const;
+
 #[macro_export]
 macro_rules! entrypoint {
     ($pubkey:literal) => {
@@ -9,7 +11,9 @@ macro_rules! entrypoint {
 
         #[cfg(not(feature = "cpi"))]
         pub const IDL_AUTHORITIES: &[anchor_lang::solana_program::pubkey::Pubkey] =
-            &[$(anchor_lang::pubkey!($pubkey)),+];
+            &[$(anchor_lang::solana_program::pubkey::Pubkey::new_from_array(
+                $crate::decode_32_const($pubkey)
+            )),+];
 
         #[cfg(not(feature = "cpi"))]
         anchor_lang::solana_program::entrypoint!(__safe_idl_gated_entry);
