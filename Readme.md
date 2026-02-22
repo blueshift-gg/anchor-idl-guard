@@ -80,7 +80,9 @@ pub mod my_program {
 You can also pass in multiple authorities for greater flexibility:
 
 ```rust
-entrypoint!(["Authority1111111111111111111111111111111111", "Authority2222222222222222222222222222222222222"]);
+entrypoint!([
+    "Authority1111111111111111111111111111111111", "Authority2222222222222222222222222222222222222"
+]);
 ```
 
 ### Feature Flags
