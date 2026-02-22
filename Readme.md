@@ -40,7 +40,7 @@ Anchor's `IdlCreateAccount` instruction creates the canonical IDL account (deriv
 
 ```toml
 [dependencies]
-anchor-idl-guard = 0.1.0
+anchor-idl-guard = "0.1.0"
 ```
 
 ### 2. Enable the `no-entrypoint` feature
