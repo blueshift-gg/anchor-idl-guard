@@ -9,16 +9,16 @@ Every version of Anchor since 0.3.0 is subject to several minor attack vectors i
 
 While these will be addressed in the future through the Program Metadata Program, many users have yet to upgrade to modern versions of Anchor and will remain susceptible to these attacks.
 
-To prevent this in current and legacy versions of Anchor, `anchor_idl_guard::entrypoint` provides a drop-in replacement for Anchor's default entrypoint macro that gates access to the `IdlCreate` and `IdlCreateBuffer` instructions behind a simple whitelist.
+To prevent the attacks in current and legacy versions of Anchor, `anchor_idl_guard::entrypoint` provides a drop-in replacement for Anchor's default entrypoint macro that gates access to the `IdlCreate` and `IdlCreateBuffer` instructions behind a simple whitelist.
 
 ## Attack Vectors
 
 ### 1. `IdlCreateBuffer` Account Takeover and LoF
 
-Anchor's `IdlCreateBuffer` instruction writes a buffer authority into any account passed to it **without doing any signer checks**. An attacker can target any program-owned account that:
+Anchor's `IdlCreateBuffer` instruction writes a buffer authority into any account passed to it **without doing any signer checks**. An attacker can target any program-owned account that has:
 
-- Has ≥44 bytes of data (8-byte discriminator + 32-byte authority + 4-byte buffer length), and
-- Has 8 leading zero bytes (common in `AccountInfo`, `UncheckedAccount`, and misused `zero-copy` and `zero` constraint account layouts)
+- ≥ 44 bytes of data (8-byte discriminator + 32-byte authority + 4-byte buffer length), and
+- 8 leading zero bytes (common in `AccountInfo`, `UncheckedAccount`, and misused `zero-copy` and `zero` constraint account layouts)
 
 To take over any such account, the attacker simply calls `IdlCreateBuffer` on the victim account, instantiating themselves as the buffer authority, enabling them to subsequently call `IdlCloseAccount` to drain all lamports from the account, resulting in loss of funds for any accounts matching the above criteria.
 
