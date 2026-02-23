@@ -33,8 +33,8 @@ Anchor's `IdlCreateAccount` instruction creates the canonical IDL account (deriv
 ## How It Works
 
 1. `anchor_idl_guard` exports a single `entrypoint!` macro that replaces Anchor's default program entrypoint with a gated version. 
-2. Before forwarding any instruction to Anchor's `entry()` function, it inspects the instruction data for the IDL discriminator (`0x40f4bc78a7e9690a`). 
-3. If an IDL instruction is detected, it checks the secondary discriminator for the two offeding instructions:
+2. Before calling Anchor's `entry()` function, it inspects `instruction_data` for the IDL discriminator (`0x40f4bc78a7e9690a`). 
+3. If an IDL instruction is detected, it checks the secondary discriminator for the two offending instructions:
    1.  `0x00` (`IdlCreateAccount`), and 
    2.  `0x01` (`IdlCreateBuffer`)
 4. The signer of the instruction is matched against the whitelist of authorized public keys.
@@ -77,11 +77,12 @@ pub mod my_program {
 }
 ```
 
-You can also pass in multiple authorities for greater flexibility:
+Multiple authorities is also supported for greater flexibility:
 
 ```rust
 entrypoint!([
-    "Authority1111111111111111111111111111111111", "Authority2222222222222222222222222222222222222"
+    "Authority1111111111111111111111111111111111", 
+    "Authority2222222222222222222222222222222222222",
 ]);
 ```
 
