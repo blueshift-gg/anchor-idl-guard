@@ -7,24 +7,24 @@ Every version of Anchor since 0.3.0 is subject to several minor attack vectors i
 - Close these accounts to reclaim their lamports.
 - Grief the program owner and trick users by stealing the program's canonical IDL account.
 
-While these will be addressed in the future by the use of the Program Metadata Program, many users are yet to upgrade to modern versions of Anchor, and thus will remain susceptible to these attacks.
+While these will be addressed in the future through the Program Metadata Program, many users have yet to upgrade to modern versions of Anchor and will remain susceptible to these attacks.
 
-In order to prevent this in current and legacy versions of anchor, `anchor_idl_guard::entrypoint` provides a drop-in replacement for Anchor's default entrypoint macro that gates access to the `IdlCreate` and `IdlCreateBuffer` instructions behind a simple whitelist.
+To prevent this in current and legacy versions of Anchor, `anchor_idl_guard::entrypoint` provides a drop-in replacement for Anchor's default entrypoint macro that gates access to the `IdlCreate` and `IdlCreateBuffer` instructions behind a simple whitelist.
 
 ## Attack Vectors
 
 ### 1. `IdlCreateBuffer` Account Takeover and LoF
 
-As Anchor's `IdlCreateBuffer` instruction writes a buffer authority into any account passed to it **without doing any signer checks**. An attacker can target any program-owned account that:
+Anchor's `IdlCreateBuffer` instruction writes a buffer authority into any account passed to it **without doing any signer checks**. An attacker can target any program-owned account that:
 
 - Has ≥44 bytes of data (8-byte discriminator + 32-byte authority + 4-byte buffer length), and
-- 8 leading zero bytes (common in `AccountInfo`, `UncheckedAccount`, and misused `zero-copy` and `zero` constraint account layouts)
+- Has 8 leading zero bytes (common in `AccountInfo`, `UncheckedAccount`, and misused `zero-copy` and `zero` constraint account layouts)
 
 To take over any such account, the attacker simply calls `IdlCreateBuffer` on the victim account, instantiating themselves as the buffer authority, enabling them to subsequently call `IdlCloseAccount` to drain all lamports from the account, resulting in loss of funds for any accounts matching the above criteria.
 
 ### 2. `IdlCreateBuffer` Arbitrary Data Injection
 
-By simply creating a new account with `system_program::create_account` and assigning the owner to an Anchor program, an attacker is also able to inject abritrary data into this account at any offset ≥44 and later close and reclaim the account by the same method described above.
+By simply creating a new account with `system_program::create_account` and assigning the owner to an Anchor program, an attacker can also inject arbitrary data into this account at any offset ≥44 and later close and reclaim the account using the same method described above.
 
 ### 3. `IdlCreateAccount` Hijack
 
@@ -77,7 +77,7 @@ pub mod my_program {
 }
 ```
 
-Multiple authorities is also supported for greater flexibility:
+Multiple authorities are also supported for greater flexibility:
 
 ```rust
 entrypoint!([
@@ -97,4 +97,4 @@ entrypoint!([
 
 ## Alternatives
 
-It is also possible to mitigate IDL-based attacks by simply enabling the `no-idl` feature in your Cargo.toml, however doing so will also prevent you from being able to publish your IDL which may not be your intended outcome.
+It is also possible to mitigate IDL-based attacks by simply enabling the `no-idl` feature in your `Cargo.toml`; however, doing so will also prevent you from publishing your IDL, which may not be your intended outcome.
