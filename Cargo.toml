@@ -3,6 +3,7 @@ name = "anchor-idl-guard"
 version = "0.1.0"
 authors = ["Dean Little <dean@blueshift.gg>"]
 description = "Created to fix Anchor"
+license = "MIT"
 edition = "2021"
 
 [lib]
